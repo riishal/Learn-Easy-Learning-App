@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "933967052915",
+    "project_id": "learn-easy-6674b",
+    "storage_bucket": "learn-easy-6674b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933967052915:android:6b023aacf7ea91df6b2a06",
+        "android_client_info": {
+          "package_name": "com.example.learn_easy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYR4Tjfk3MRNN1FJ8tybHFiyZUqxvdVvk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
