@@ -1,9 +1,9 @@
+import 'dart:io';
+
+import 'package:background_downloader/background_downloader.dart';
 import 'package:chewie/chewie.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:learn_easy/models/user_model.dart';
 import 'package:learn_easy/view/home_page.dart';
@@ -31,25 +31,42 @@ class CourseDetails extends StatefulWidget {
   State<CourseDetails> createState() => _CourseDetailsState();
 }
 
+enum ButtonState { download, cancel, pause, resume, reset }
+
 class _CourseDetailsState extends State<CourseDetails>
     with SingleTickerProviderStateMixin {
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
   Future<void>? initializeVideoPlayerFuture;
   TabController? tabController;
+  bool isExist = false;
+
+  ButtonState buttonState = ButtonState.download;
+  bool downloadWithError = false;
+  TaskStatus? downloadTaskStatus;
+  DownloadTask? backgroundDownloadTask;
 
   @override
   void initState() {
     tabController = TabController(length: 2, vsync: this);
-    initPlayer(widget.data[buttonIndex]["videos"].first["videoLink"]);
+    initPlayer(widget.data[buttonIndex]["videos"].first["videoLink"],
+        widget.data[buttonIndex]["videos"].first["videoName"]);
     super.initState();
   }
 
-  initPlayer(url) {
+  initPlayer(url, fileName) {
     videoPlayerController?.dispose();
     chewieController?.dispose();
 
-    videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
+    String path =
+        "/data/user/0/com.example.learn_easy/app_flutter/my/directory/$fileName.mp4";
+
+    isExist = File(path).existsSync();
+    print("///////////////////////////////////////////////////$isExist");
+
+    videoPlayerController = isExist
+        ? VideoPlayerController.file(File(path))
+        : VideoPlayerController.networkUrl(Uri.parse(url));
     initializeVideoPlayerFuture =
         videoPlayerController?.initialize().then((value) {});
     chewieController = ChewieController(
@@ -59,6 +76,56 @@ class _CourseDetailsState extends State<CourseDetails>
       aspectRatio: 16 / 9,
       looping: true,
     );
+  }
+
+  /// Process center button press (initially 'Download' but the text changes
+  /// based on state)
+  Future<void> processButtonPress(String url, String fileName) async {
+    switch (buttonState) {
+      case ButtonState.download:
+        // start download
+        backgroundDownloadTask = DownloadTask(
+          url: url,
+          filename: '$fileName.mp4',
+          directory: 'my/directory',
+          baseDirectory: BaseDirectory.applicationDocuments,
+          updates: Updates.statusAndProgress,
+          allowPause: true,
+        );
+        await FileDownloader().enqueue(backgroundDownloadTask!);
+        break;
+      case ButtonState.cancel:
+        // cancel download
+        if (backgroundDownloadTask != null) {
+          await FileDownloader()
+              .cancelTasksWithIds([backgroundDownloadTask!.taskId]);
+          // scaffold
+        }
+        break;
+      case ButtonState.reset:
+        downloadTaskStatus = null;
+        buttonState = ButtonState.download;
+        break;
+      case ButtonState.pause:
+        if (backgroundDownloadTask != null) {
+          await FileDownloader().pause(backgroundDownloadTask!);
+        }
+        break;
+      case ButtonState.resume:
+        if (backgroundDownloadTask != null) {
+          await FileDownloader().resume(backgroundDownloadTask!);
+        }
+        break;
+    }
+    String filePath = await backgroundDownloadTask!.filePath();
+    debugPrint('////////////////////// filePath: $filePath');
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void downLoadVideo(String url, fileName) async {
+    processButtonPress(url, fileName);
   }
 
   @override
@@ -72,7 +139,7 @@ class _CourseDetailsState extends State<CourseDetails>
                   Navigator.pop(context);
                   buttonIndex1 = 0;
                 },
-                icon: Icon(Icons.arrow_back)),
+                icon: const Icon(Icons.arrow_back)),
             backgroundColor: Colors.grey[800],
             title: Text(
               "Learn Easy",
@@ -112,7 +179,7 @@ class _CourseDetailsState extends State<CourseDetails>
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 7,
               ),
             ]),
@@ -123,7 +190,7 @@ class _CourseDetailsState extends State<CourseDetails>
                     future: initializeVideoPlayerFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return AspectRatio(
+                        return const AspectRatio(
                             aspectRatio: 16 / 9,
                             child: Center(child: CircularProgressIndicator()));
                       }
@@ -132,15 +199,15 @@ class _CourseDetailsState extends State<CourseDetails>
                         child: Chewie(controller: chewieController!),
                       );
                     })
-                : Text("Click and paly"),
-            SizedBox(
+                : const Text("Click and paly"),
+            const SizedBox(
               height: 5,
             ),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 14),
-              height: size.height * 0.53,
+              margin: const EdgeInsets.symmetric(horizontal: 14),
+              height: size.height / 1.87,
               child: Column(children: [
-                Container(
+                SizedBox(
                   height: size.height * 0.15,
                   child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -157,7 +224,7 @@ class _CourseDetailsState extends State<CourseDetails>
                                   fontWeight: FontWeight.bold,
                                   fontSize: 19),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 9,
                             ),
                             Text(
@@ -165,7 +232,7 @@ class _CourseDetailsState extends State<CourseDetails>
                               style: GoogleFonts.adamina(
                                   letterSpacing: 1, fontSize: 15),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 9,
                             ),
                             Text(
@@ -177,14 +244,29 @@ class _CourseDetailsState extends State<CourseDetails>
                             ),
                           ],
                         ),
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.orange,
-                          child: Icon(
-                            Icons.download,
-                            color: Colors.white,
-                            size: 40,
-                          ),
+                        GestureDetector(
+                          onTap: () {
+                            downLoadVideo(
+                                widget.data[buttonIndex]["videos"][buttonIndex1]
+                                    ["videoLink"],
+                                widget.data[buttonIndex]["videos"][buttonIndex1]
+                                    ["videoName"]);
+                          },
+                          child: isExist
+                              ? Icon(
+                                  Icons.play_arrow,
+                                  color: Colors.white,
+                                  size: 40,
+                                )
+                              : const CircleAvatar(
+                                  radius: 30,
+                                  backgroundColor: Colors.orange,
+                                  child: Icon(
+                                    Icons.download,
+                                    color: Colors.white,
+                                    size: 40,
+                                  ),
+                                ),
                         )
                       ]),
                 ),
@@ -200,7 +282,7 @@ class _CourseDetailsState extends State<CourseDetails>
                     labelColor: const Color.fromARGB(255, 246, 116, 61),
                     unselectedLabelColor: Colors.grey,
                     controller: tabController,
-                    tabs: [
+                    tabs: const [
                       Tab(
                         text: "Videos",
                       ),
@@ -208,7 +290,7 @@ class _CourseDetailsState extends State<CourseDetails>
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Expanded(
@@ -232,14 +314,18 @@ class _CourseDetailsState extends State<CourseDetails>
                               child: InkWell(
                                 onTap: () {
                                   setState(() {
-                                    initPlayer(widget.data[buttonIndex]
-                                            ["videos"][index]["videoLink"]
-                                        .toString());
+                                    initPlayer(
+                                        widget.data[buttonIndex]["videos"]
+                                                [index]["videoLink"]
+                                            .toString(),
+                                        widget.data[buttonIndex]["videos"]
+                                                [index]["videoName"]
+                                            .toString());
                                     buttonIndex1 = index;
                                   });
                                 },
                                 child: Row(children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   Expanded(
@@ -276,7 +362,7 @@ class _CourseDetailsState extends State<CourseDetails>
                               ),
                             ),
                           ),
-                      separatorBuilder: (context, index) => SizedBox(
+                      separatorBuilder: (context, index) => const SizedBox(
                             height: 8,
                           ),
                       itemCount: widget.data[buttonIndex]["videos"].length),
@@ -312,7 +398,7 @@ class _CourseDetailsState extends State<CourseDetails>
                                   });
                                 },
                                 child: Row(children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   Expanded(
@@ -342,7 +428,7 @@ class _CourseDetailsState extends State<CourseDetails>
                               ),
                             ),
                           ),
-                      separatorBuilder: (context, index) => SizedBox(
+                      separatorBuilder: (context, index) => const SizedBox(
                             height: 8,
                           ),
                       itemCount: widget.data[buttonIndex]["pdf"].length),

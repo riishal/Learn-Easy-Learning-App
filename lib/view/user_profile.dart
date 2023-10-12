@@ -1,8 +1,5 @@
-import 'package:chewie/chewie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:learn_easy/models/user_model.dart';
 import 'package:learn_easy/service/ui_helper.dart';
@@ -42,7 +39,7 @@ class _UserProfileState extends State<UserProfile> {
       body: SafeArea(
           child: Container(
         color: const Color.fromARGB(255, 250, 242, 237),
-        margin: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         height: size.height / 0,
         width: double.infinity,
         child: Column(
@@ -53,7 +50,7 @@ class _UserProfileState extends State<UserProfile> {
               radius: 70,
               backgroundImage: NetworkImage(widget.userModel.profilepic!),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
@@ -63,36 +60,29 @@ class _UserProfileState extends State<UserProfile> {
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[800]),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             container1("Email", widget.userModel.email),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             container1("Class", widget.userModel.class0),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             container1("Location", widget.userModel.location),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             container1("Age", widget.userModel.age),
-            SizedBox(
+            const SizedBox(
               height: 17,
             ),
             SizedBox(
               height: 50,
               width: 300,
               child: ElevatedButton(
-                child: Text(
-                  "Log Out",
-                  style: GoogleFonts.adamina(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     shape: RoundedRectangleBorder(
@@ -100,6 +90,13 @@ class _UserProfileState extends State<UserProfile> {
                 onPressed: () {
                   UIHelper.showLogOut(context);
                 },
+                child: Text(
+                  "Log Out",
+                  style: GoogleFonts.adamina(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
             )
           ],
@@ -124,7 +121,7 @@ class _UserProfileState extends State<UserProfile> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(children: [
-            SizedBox(
+            const SizedBox(
               width: 20,
             ),
             Text(

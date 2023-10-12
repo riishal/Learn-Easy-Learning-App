@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:learn_easy/service/ui_helper.dart';
@@ -85,14 +83,14 @@ class _SignUpPageState extends State<SignUpPage> {
           child: Container(
         height: double.infinity,
         width: double.infinity,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white),
         child: Center(
           child: SingleChildScrollView(
               child: Column(
             children: [
               Container(
                 height: 170,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage("assets/image/loginImage1.png"))),
               ),
@@ -103,12 +101,12 @@ class _SignUpPageState extends State<SignUpPage> {
                     fontWeight: FontWeight.bold,
                     color: Colors.grey[800]),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 48,
               ),
               Container(
                 decoration: BoxDecoration(
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         blurRadius: 3,
                         color: Colors.grey,
@@ -120,7 +118,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 width: size.width * 0.89,
                 child: TextFormField(
                     controller: emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Email",
                       border: OutlineInputBorder(borderSide: BorderSide.none),
                     )),
@@ -130,7 +128,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               Container(
                 decoration: BoxDecoration(
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         blurRadius: 3,
                         color: Colors.grey,
@@ -145,7 +143,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     controller: passwordController,
                     decoration: InputDecoration(
                       hintText: "Password",
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                      border:
+                          const OutlineInputBorder(borderSide: BorderSide.none),
                       suffixIcon: InkWell(
                           onTap: togglePasswordView,
                           child: Icon(
@@ -154,12 +153,12 @@ class _SignUpPageState extends State<SignUpPage> {
                           )),
                     )),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 19,
               ),
               Container(
                 decoration: BoxDecoration(
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         blurRadius: 3,
                         color: Colors.grey,
@@ -174,7 +173,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     controller: cpasswordController,
                     decoration: InputDecoration(
                       hintText: "Confirm Password",
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                      border:
+                          const OutlineInputBorder(borderSide: BorderSide.none),
                       suffixIcon: InkWell(
                           onTap: togglePasswordView1,
                           child: Icon(
@@ -183,7 +183,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           )),
                     )),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               SizedBox(
@@ -209,25 +209,24 @@ class _SignUpPageState extends State<SignUpPage> {
           )),
         ),
       )),
-      bottomNavigationBar: Container(
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text("Already have an account?",
-              style: GoogleFonts.adamina(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800])),
-          CupertinoButton(
-            child: Text(
-              'Log In',
-              style: GoogleFonts.adamina(
-                  fontWeight: FontWeight.bold, color: Colors.blue),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          )
-        ]),
-      ),
+      bottomNavigationBar:
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text("Already have an account?",
+            style: GoogleFonts.adamina(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800])),
+        CupertinoButton(
+          child: Text(
+            'Log In',
+            style: GoogleFonts.adamina(
+                fontWeight: FontWeight.bold, color: Colors.blue),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        )
+      ]),
     );
   }
 

@@ -36,8 +36,9 @@ class PdfViewPage extends StatelessWidget {
             print('page change: $page/$total');
           },
         ).cachedFromUrl(
-          'https://africau.edu/images/default/sample.pdf',
-          placeholder: (progress) => Center(child: Text('$progress %')),
+          data[buttonIndex]["pdf"][pdfIndex]["pdfLink"].toString(),
+          placeholder: (progress) =>
+              Center(child: Text("$progress %".toString())),
           errorWidget: (error) => Center(child: Text(error.toString())),
         ));
   }

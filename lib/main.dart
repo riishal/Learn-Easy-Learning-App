@@ -23,11 +23,11 @@ void main() async {
         userModel: thisUserModel,
       ));
     } else {
-      runApp(MyApp());
+      runApp(const MyApp());
     }
   } else {
     //not logged In
-    runApp(MyApp());
+    runApp(const MyApp());
   }
 }
 
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(primarySwatch: Colors.blue),
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        home: const LoginPage(),
       ),
     );
   }
